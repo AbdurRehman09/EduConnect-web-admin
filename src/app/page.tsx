@@ -90,27 +90,25 @@ const dummyTutors: Tutor[] = [
 
 export default function AdminDashboard() {
   return (
-    <div className="min-h-screen bg-[#D4E2B6]">
-      <div className="p-6">
-        <h1 className="text-2xl  mb-6 text-[#5C8307]">
-          Admin Dashboard
-        </h1>
-        <Tabs
-          defaultActiveKey="students"
-          items={[
-            {
-              key: 'students',
-              label: 'Students',
-              children: <StudentTable initialData={dummyStudents} />,
-            },
-            {
-              key: 'tutors',
-              label: 'Tutors',
-              children: <TutorTable initialData={dummyTutors} />,
-            },
-          ]}
-        />
-      </div>
+    <div className=" min-h-screen p-6">
+      <h1 className="text-2xl mb-6" style={{ color: "#5C8307" }}>
+        Admin Dashboard
+      </h1>
+      <Tabs
+        defaultActiveKey="students"
+        items={[
+          {
+            key: 'students',
+            label: 'Students',
+            children: <StudentTable initialData={dummyStudents} />,
+          },
+          {
+            key: 'tutors',
+            label: 'Tutors',
+            children: <TutorTable initialData={dummyTutors} />,
+          },
+        ]}
+      />
     </div>
   );
 }
