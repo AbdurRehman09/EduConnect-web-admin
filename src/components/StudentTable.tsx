@@ -1,10 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Table, Modal, Form, Input, Button } from 'antd';
 import type { Student } from '@/types';
 
-export default function StudentTable() {
+// Add this to the component props
+interface StudentTableProps {
+    initialData: Student[];
+}
+
+export default function StudentTable({ initialData }: StudentTableProps) {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
     const [form] = Form.useForm();
@@ -16,23 +21,36 @@ export default function StudentTable() {
         { title: 'Country', dataIndex: 'country', key: 'country' },
     ];
 
-    const handleRowClick = (record: Student) => {
-        setSelectedStudent(record);
-        form.setFieldsValue(record);
-        setIsModalVisible(true);
-    };
+    useEffect(() => {
+        if (selectedStudent && isModalVisible) {
+            form.setFieldsValue(selectedStudent);
+        }
+    }, [selectedStudent, isModalVisible, form]);
 
-    const handleSave = async (values: any) => {
+    const handleRowClick = useCallback((record: Student) => {
+        setSelectedStudent(record);
+        setIsModalVisible(true);
+    }, []);
+
+    const handleSave = useCallback(async (values: any) => {
         console.log('Updated values:', values);
         setIsModalVisible(false);
+        setSelectedStudent(null);
         form.resetFields();
-    };
+    }, [form]);
+
+    const handleCancel = useCallback(() => {
+        setIsModalVisible(false);
+        setSelectedStudent(null);
+        form.resetFields();
+    }, [form]);
 
     return (
-        <>
+        <div>
             <Table
+                rowKey="id"
                 columns={columns}
-                dataSource={[]}
+                dataSource={initialData}
                 onRow={(record) => ({
                     onClick: () => handleRowClick(record),
                 })}
@@ -42,10 +60,16 @@ export default function StudentTable() {
             <Modal
                 title="Edit Student Information"
                 open={isModalVisible}
-                onCancel={() => setIsModalVisible(false)}
+                onCancel={handleCancel}
                 footer={null}
+                destroyOnClose
+                maskClosable={false}
             >
-                <Form form={form} onFinish={handleSave} layout="vertical">
+                <Form
+                    form={form}
+                    onFinish={handleSave}
+                    layout="vertical"
+                >
                     <Form.Item name="name" label="Name" rules={[{ required: true }]}>
                         <Input />
                     </Form.Item>
@@ -65,6 +89,6 @@ export default function StudentTable() {
                     </Form.Item>
                 </Form>
             </Modal>
-        </>
+        </div>
     );
 }

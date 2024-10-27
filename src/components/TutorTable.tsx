@@ -1,10 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Table, Modal, Form, Input, Select, Button } from 'antd';
 import type { Tutor } from '@/types';
 
-export default function TutorTable() {
+// Add this to the component props
+interface TutorTableProps {
+    initialData: Tutor[];
+}
+
+export default function TutorTable({ initialData }: TutorTableProps) {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedTutor, setSelectedTutor] = useState<Tutor | null>(null);
     const [form] = Form.useForm();
@@ -18,23 +23,36 @@ export default function TutorTable() {
         { title: 'Country', dataIndex: 'country', key: 'country' },
     ];
 
-    const handleRowClick = (record: Tutor) => {
-        setSelectedTutor(record);
-        form.setFieldsValue(record);
-        setIsModalVisible(true);
-    };
+    useEffect(() => {
+        if (selectedTutor && isModalVisible) {
+            form.setFieldsValue(selectedTutor);
+        }
+    }, [selectedTutor, isModalVisible, form]);
 
-    const handleSave = async (values: any) => {
+    const handleRowClick = useCallback((record: Tutor) => {
+        setSelectedTutor(record);
+        setIsModalVisible(true);
+    }, []);
+
+    const handleSave = useCallback(async (values: any) => {
         console.log('Updated values:', values);
         setIsModalVisible(false);
+        setSelectedTutor(null);
         form.resetFields();
-    };
+    }, [form]);
+
+    const handleCancel = useCallback(() => {
+        setIsModalVisible(false);
+        setSelectedTutor(null);
+        form.resetFields();
+    }, [form]);
 
     return (
-        <>
+        <div>
             <Table
+                rowKey="id"
                 columns={columns}
-                dataSource={[]}
+                dataSource={initialData}
                 onRow={(record) => ({
                     onClick: () => handleRowClick(record),
                 })}
@@ -44,10 +62,16 @@ export default function TutorTable() {
             <Modal
                 title="Edit Tutor Information"
                 open={isModalVisible}
-                onCancel={() => setIsModalVisible(false)}
+                onCancel={handleCancel}
                 footer={null}
+                destroyOnClose
+                maskClosable={false}
             >
-                <Form form={form} onFinish={handleSave} layout="vertical">
+                <Form
+                    form={form}
+                    onFinish={handleSave}
+                    layout="vertical"
+                >
                     <Form.Item name="fullName" label="Full Name" rules={[{ required: true }]}>
                         <Input />
                     </Form.Item>
@@ -77,6 +101,6 @@ export default function TutorTable() {
                     </Form.Item>
                 </Form>
             </Modal>
-        </>
+        </div>
     );
 }
