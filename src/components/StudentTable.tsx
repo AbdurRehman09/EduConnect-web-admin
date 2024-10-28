@@ -19,6 +19,23 @@ export default function StudentTable({ initialData }: StudentTableProps) {
         { title: 'Cell No.', dataIndex: 'cellNo', key: 'cellNo' },
         { title: 'City', dataIndex: 'city', key: 'city' },
         { title: 'Country', dataIndex: 'country', key: 'country' },
+        {
+            title: 'Tutoring Requests',
+            dataIndex: 'tutoringRequests',
+            key: 'tutoringRequests',
+            render: (requests: any[]) => (
+                <div>
+                    {requests.map((request, index) => (
+                        <div key={index} className="mb-2 p-2 bg-[#FFFFE0] rounded">
+                            <div><strong>Subject:</strong> {request.subject}</div>
+                            <div><strong>Hours:</strong> {request.hours}</div>
+                            <div><strong>Fees:</strong> ${request.fees}</div>
+                            <div><strong>Description:</strong> {request.description}</div>
+                        </div>
+                    ))}
+                </div>
+            ),
+        },
     ];
 
     useEffect(() => {
@@ -64,6 +81,7 @@ export default function StudentTable({ initialData }: StudentTableProps) {
                 footer={null}
                 destroyOnClose
                 maskClosable={false}
+                width={800}
             >
                 <Form
                     form={form}
@@ -82,6 +100,59 @@ export default function StudentTable({ initialData }: StudentTableProps) {
                     <Form.Item name="country" label="Country" rules={[{ required: true }]}>
                         <Input />
                     </Form.Item>
+
+                    {/* Add Form List for Tutoring Requests */}
+                    <Form.List name="tutoringRequests">
+                        {(fields, { add, remove }) => (
+                            <>
+                                {fields.map(({ key, name, ...restField }) => (
+                                    <div key={key} className="p-4 border rounded mb-4 bg-[#FFFFE0]">
+                                        <Form.Item
+                                            {...restField}
+                                            name={[name, 'subject']}
+                                            label="Subject"
+                                            rules={[{ required: true }]}
+                                        >
+                                            <Input />
+                                        </Form.Item>
+                                        <Form.Item
+                                            {...restField}
+                                            name={[name, 'hours']}
+                                            label="Hours"
+                                            rules={[{ required: true }]}
+                                        >
+                                            <Input type="number" />
+                                        </Form.Item>
+                                        <Form.Item
+                                            {...restField}
+                                            name={[name, 'fees']}
+                                            label="Fees"
+                                            rules={[{ required: true }]}
+                                        >
+                                            <Input type="number" prefix="$" />
+                                        </Form.Item>
+                                        <Form.Item
+                                            {...restField}
+                                            name={[name, 'description']}
+                                            label="Description"
+                                            rules={[{ required: true }]}
+                                        >
+                                            <Input.TextArea />
+                                        </Form.Item>
+                                        <Button type="dashed" onClick={() => remove(name)} danger>
+                                            Remove Request
+                                        </Button>
+                                    </div>
+                                ))}
+                                <Form.Item>
+                                    <Button type="dashed" onClick={() => add()} block>
+                                        Add Tutoring Request
+                                    </Button>
+                                </Form.Item>
+                            </>
+                        )}
+                    </Form.List>
+
                     <Form.Item>
                         <Button type="primary" htmlType="submit">
                             Save Changes

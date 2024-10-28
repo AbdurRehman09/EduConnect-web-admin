@@ -1,114 +1,134 @@
 'use client';
 
-import { Tabs } from 'antd';
-import StudentTable from '@/components/StudentTable';
-import TutorTable from '@/components/TutorTable';
-import { Student, Tutor } from '@/types';
+import { Form, Input, Button, message } from 'antd';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useAuth } from '@/components/AntdProvider';
+import Image from 'next/image';
+import loginIllustration from '../../public/login-illustration.jpeg';
 
-// Dummy data for students
-const dummyStudents: Student[] = [
-  {
-    id: '1',
-    name: 'John Doe',
-    cellNo: '+1-234-567-8901',
-    city: 'New York',
-    country: 'USA',
-    tutoringRequests: [
-      {
-        subject: 'Mathematics',
-        hours: 10,
-        fees: 500,
-        description: 'Need help with calculus',
-      }
-    ]
-  },
-  {
-    id: '2',
-    name: 'Jane Smith',
-    cellNo: '+1-234-567-8902',
-    city: 'London',
-    country: 'UK',
-    tutoringRequests: [
-      {
-        subject: 'Physics',
-        hours: 8,
-        fees: 400,
-        description: 'Quantum mechanics tutorials',
-      }
-    ]
-  },
-  {
-    id: '3',
-    name: 'Alice Johnson',
-    cellNo: '+1-234-567-8903',
-    city: 'Toronto',
-    country: 'Canada',
-    tutoringRequests: [
-      {
-        subject: 'Chemistry',
-        hours: 6,
-        fees: 300,
-        description: 'Organic chemistry help needed',
-      }
-    ]
-  }
-];
+interface LoginForm {
+  email: string;
+  password: string;
+}
 
-// Dummy data for tutors
-const dummyTutors: Tutor[] = [
-  {
-    id: '1',
-    fullName: 'Dr. Robert Wilson',
-    email: 'robert.wilson@email.com',
-    password: 'hashedPassword123',
-    phoneNumber: '+1-234-567-8904',
-    experienceLevel: 'advanced',
-    city: 'Boston',
-    country: 'USA'
-  },
-  {
-    id: '2',
-    fullName: 'Prof. Sarah Brown',
-    email: 'sarah.brown@email.com',
-    password: 'hashedPassword456',
-    phoneNumber: '+1-234-567-8905',
-    experienceLevel: 'intermediate',
-    city: 'Manchester',
-    country: 'UK'
-  },
-  {
-    id: '3',
-    fullName: 'Mr. James Lee',
-    email: 'james.lee@email.com',
-    password: 'hashedPassword789',
-    phoneNumber: '+1-234-567-8906',
-    experienceLevel: 'beginner',
-    city: 'Vancouver',
-    country: 'Canada'
-  }
-];
+const ADMIN_CREDENTIALS = {
+  email: 'admin@educonnect.com',
+  password: 'admin123'
+};
 
-export default function AdminDashboard() {
+export default function LoginPage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
+
+  const onFinish = async (values: LoginForm) => {
+    setLoading(true);
+    try {
+      if (values.email === ADMIN_CREDENTIALS.email && values.password === ADMIN_CREDENTIALS.password) {
+        document.cookie = 'auth=true; path=/';
+        login();
+        message.success('Login successful');
+        router.push('/dashboard');
+      } else {
+        message.error('Invalid credentials');
+      }
+    } catch (error) {
+      message.error('Login failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className=" min-h-screen p-6">
-      <h1 className="text-2xl mb-6" style={{ color: "#5C8307" }}>
-        Admin Dashboard
-      </h1>
-      <Tabs
-        defaultActiveKey="students"
-        items={[
-          {
-            key: 'students',
-            label: 'Students',
-            children: <StudentTable initialData={dummyStudents} />,
-          },
-          {
-            key: 'tutors',
-            label: 'Tutors',
-            children: <TutorTable initialData={dummyTutors} />,
-          },
-        ]}
-      />
+    <div className="min-h-screen bg-[#D4E2B6]">
+      {/* Header */}
+      <div className="bg-[#5C8307] p-4">
+        <h1 className="text-2xl text-white font-bold">EduConnect</h1>
+      </div>
+
+      {/* Main Container */}
+      <div className="flex justify-center items-center min-h-[calc(100vh-64px)]">
+        <div className="w-[400px] bg-white rounded-3xl overflow-hidden">
+          {/* Image Section - Fixed height */}
+          <div className="h-[250px] bg-[#D4E2B6]">
+            <Image
+              src={loginIllustration}
+              alt="Education Illustration"
+            // fill
+            // style={{ objectFit: 'fill' }}
+            />
+          </div>
+
+          {/* Form Section - Same width as image */}
+          <div className="p-8">
+            <Form
+              name="login"
+              onFinish={onFinish}
+              layout="vertical"
+              requiredMark={false}
+            >
+              <Form.Item
+                name="email"
+                rules={[
+                  { required: true, message: 'Please input your email!' },
+                  { type: 'email', message: 'Please enter a valid email!' }
+                ]}
+              >
+                <Input
+                  placeholder="Email"
+                  className="h-12 rounded-lg"
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="password"
+                rules={[{ required: true, message: 'Please input your password!' }]}
+                className="mb-2"
+              >
+                <Input.Password
+                  placeholder="Password"
+                  className="h-12 rounded-lg"
+                />
+              </Form.Item>
+
+              <div className="flex justify-end mb-6">
+                <a
+                  href="#"
+                  className="text-[#5C8307] hover:text-[#4a6906]"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    message.info('Password reset functionality coming soon');
+                  }}
+                >
+                  Forgot Password?
+                </a>
+              </div>
+
+              <Button
+                type="primary"
+                htmlType="submit"
+                block
+                loading={loading}
+                className="h-12 rounded-lg mb-4"
+                style={{
+                  backgroundColor: '#5C8307',
+                  borderColor: '#5C8307'
+                }}
+              >
+                LOG IN
+              </Button>
+
+              <div className="text-center text-gray-600">
+                Don't have an account?{' '}
+                <a href="#" className="text-[#5C8307] hover:text-[#4a6906]">
+                  Sign Up
+                </a>
+              </div>
+            </Form>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

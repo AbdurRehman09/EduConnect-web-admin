@@ -22,3 +22,11 @@ export interface Tutor {
     city: string;
     country: string;
 }
+
+export interface Admin {
+    id: string;
+    name: string;
+    email: string;
+    role: 'admin' | 'super_admin';
+    lastLogin: string;
+}
