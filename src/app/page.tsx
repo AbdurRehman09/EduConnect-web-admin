@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from '@/components/AntdProvider';
 import Image from 'next/image';
-import loginIllustration from '../../public/login-illustration.jpeg';
+import loginIllustration from '../../public/login-illustration.png';
 
 interface LoginForm {
   email: string;
@@ -41,32 +41,36 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#D4E2B6]">
+    <div className="h-screen bg-[#D4E2B6] flex flex-col">
       {/* Header */}
-      <div className="bg-[#5C8307] p-4">
-        <h1 className="text-2xl text-white font-bold">EduConnect</h1>
+      <div className="bg-[#5C8307] py-3">
+        <h1 className="text-xl text-white font-bold px-4">EduConnect</h1>
       </div>
 
       {/* Main Container */}
-      <div className="flex justify-center items-center min-h-[calc(100vh-64px)]">
-        <div className="w-[400px] bg-white rounded-3xl overflow-hidden">
-          {/* Image Section - Fixed height */}
-          <div className="h-[250px] bg-[#D4E2B6]">
+      <div className="flex-1 flex justify-center items-center">
+        <div className="w-[360px] bg-white rounded-2xl shadow-lg overflow-hidden">
+          {/* Image Section */}
+          <div className="h-[180px] relative bg-[#D4E2B6] flex justify-center items-center">
             <Image
               src={loginIllustration}
               alt="Education Illustration"
-            // fill
-            // style={{ objectFit: 'fill' }}
+              width={350}
+              height={150}
+              className="object-contain"
+              style={{marginLeft:"530px"}}
+              priority
             />
           </div>
 
-          {/* Form Section - Same width as image */}
-          <div className="p-8">
+          {/* Form Section */}
+          <div className="px-6 py-5">
             <Form
               name="login"
               onFinish={onFinish}
               layout="vertical"
               requiredMark={false}
+              style={{width:"350px",margin:"auto"}}
             >
               <Form.Item
                 name="email"
@@ -77,25 +81,25 @@ export default function LoginPage() {
               >
                 <Input
                   placeholder="Email"
-                  className="h-12 rounded-lg"
+                  className="h-10 rounded-lg"
                 />
               </Form.Item>
 
               <Form.Item
                 name="password"
                 rules={[{ required: true, message: 'Please input your password!' }]}
-                className="mb-2"
+                className="mb-1"
               >
                 <Input.Password
                   placeholder="Password"
-                  className="h-12 rounded-lg"
+                  className="h-10 rounded-lg"
                 />
               </Form.Item>
 
-              <div className="flex justify-end mb-6">
+              <div className="flex justify-end mb-4">
                 <a
                   href="#"
-                  className="text-[#5C8307] hover:text-[#4a6906]"
+                  className="text-[#5C8307] hover:text-[#4a6906] text-sm"
                   onClick={(e) => {
                     e.preventDefault();
                     message.info('Password reset functionality coming soon');
@@ -110,7 +114,7 @@ export default function LoginPage() {
                 htmlType="submit"
                 block
                 loading={loading}
-                className="h-12 rounded-lg mb-4"
+                className="h-10 rounded-lg mb-3"
                 style={{
                   backgroundColor: '#5C8307',
                   borderColor: '#5C8307'
@@ -119,7 +123,7 @@ export default function LoginPage() {
                 LOG IN
               </Button>
 
-              <div className="text-center text-gray-600">
+              <div className="text-center text-gray-600 text-sm">
                 Don't have an account?{' '}
                 <a href="#" className="text-[#5C8307] hover:text-[#4a6906]">
                   Sign Up
