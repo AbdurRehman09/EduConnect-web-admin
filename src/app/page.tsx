@@ -44,7 +44,7 @@ export default function LoginPage() {
     <div className="h-screen bg-[#D4E2B6] flex flex-col">
       {/* Header */}
       <div className="bg-[#5C8307] py-3">
-        <h1 className="text-xl text-white font-bold px-4">EduConnect</h1>
+        <h1 className="text-xl font-bold px-4">EduConnect</h1>
       </div>
 
       {/* Main Container */}
@@ -81,7 +81,7 @@ export default function LoginPage() {
               >
                 <Input
                   placeholder="Email"
-                  className="h-10 rounded-lg"
+                  className="h-10 rounded-lg bg-white"
                 />
               </Form.Item>
 
@@ -92,7 +92,7 @@ export default function LoginPage() {
               >
                 <Input.Password
                   placeholder="Password"
-                  className="h-10 rounded-lg"
+                  className="h-10 rounded-lg bg-white"
                 />
               </Form.Item>
 
