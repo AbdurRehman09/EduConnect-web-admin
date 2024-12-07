@@ -1,12 +1,14 @@
 'use client';
 
 import { Tabs, Button } from 'antd';
+import { LogoutOutlined, DashboardOutlined, UserOutlined, TeamOutlined, CrownOutlined } from '@ant-design/icons';
 import StudentTable from '@/components/StudentTable';
 import TutorTable from '@/components/TutorTable';
 import AdminTable from '@/components/AdminTable';
 import { Student, Tutor, Admin } from '@/types';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AntdProvider';
+import styles from './page.module.css';
 
 // Your existing dummy data...
 const dummyStudents: Student[] = [
@@ -131,44 +133,54 @@ export default function AdminDashboard() {
     const { logout } = useAuth();
 
     const handleLogout = () => {
-        // Remove cookie or localStorage here
         document.cookie = 'auth=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
         logout();
         router.push('/');
     };
 
     return (
-        <div className="min-h-screen bg-[#D4E2B6]">
-            <div className="p-6">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold text-[#5C8307]">
-                        Admin Dashboard
-                    </h1>
-                    <Button
-                        onClick={handleLogout}
-                        type="primary"
-                        danger
-                    >
-                        Logout
-                    </Button>
-                </div>
+        <div className={styles.dashboardContainer}>
+            <div className={styles.header}>
+                <h1 className={styles.title}>
+                    <DashboardOutlined /> Admin Dashboard
+                </h1>
+                <button
+                    onClick={handleLogout}
+                    className={styles.logoutButton}
+                >
+                    <LogoutOutlined /> Logout
+                </button>
+            </div>
 
+            <div className={styles.tabsContainer}>
                 <Tabs
                     defaultActiveKey="students"
                     items={[
                         {
                             key: 'students',
-                            label: 'Students',
+                            label: (
+                                <span>
+                                    <UserOutlined /> Students
+                                </span>
+                            ),
                             children: <StudentTable initialData={dummyStudents} />,
                         },
                         {
                             key: 'tutors',
-                            label: 'Tutors',
+                            label: (
+                                <span>
+                                    <TeamOutlined /> Tutors
+                                </span>
+                            ),
                             children: <TutorTable initialData={dummyTutors} />,
                         },
                         {
                             key: 'admins',
-                            label: 'Admins',
+                            label: (
+                                <span>
+                                    <CrownOutlined /> Admins
+                                </span>
+                            ),
                             children: <AdminTable initialData={dummyAdmins} />,
                         },
                     ]}

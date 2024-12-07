@@ -1,0 +1,79 @@
+.dashboardContainer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #D4E2B6 0%, #E8F0D6 100%);
+  padding: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  background: white;
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #5C8307;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logoutButton {
+  background: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logoutButton:hover {
+  background: #ff7875;
+  transform: translateY(-2px);
+}
+
+.tabsContainer {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tabsContainer :global(.ant-tabs-nav) {
+  margin-bottom: 1.5rem;
+}
+
+.tabsContainer :global(.ant-tabs-tab) {
+  padding: 1rem 1.5rem;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+.tabsContainer :global(.ant-tabs-tab-active) {
+  background: #5C8307;
+  border-radius: 8px;
+}
+
+.tabsContainer :global(.ant-tabs-tab-active .ant-tabs-tab-btn) {
+  color: white !important;
+}
+
+.tabsContainer :global(.ant-tabs-ink-bar) {
+  background: #5C8307;
+  height: 3px;
+}
+
+.tabsContainer :global(.ant-tabs-nav::before) {
+  border-bottom: 2px solid #eee;
+}

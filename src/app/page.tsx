@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
   const router = useRouter();
   const { login } = useAuth();
 
@@ -66,16 +67,22 @@ export default function LoginPage() {
     
     if (isEmailValid && isPasswordValid) {
       setIsLoading(true);
+      setMessage({ type: '', text: '' });
+      
       try {
         if (email === 'admin@educonnect.com' && password === 'admin123') {
+          setMessage({ type: 'success', text: 'Login successful! Redirecting...' });
           document.cookie = 'auth=true; path=/';
           login();
+          // Short delay to show success message before redirect
+          await new Promise(resolve => setTimeout(resolve, 1000));
           router.push('/dashboard');
         } else {
-          setPasswordError('Invalid credentials');
+          setMessage({ type: 'error', text: 'Invalid email or password' });
+          setPassword('');
         }
-      } catch {
-        setPasswordError('Login failed');
+      } catch (error) {
+        setMessage({ type: 'error', text: 'Login failed. Please try again.' });
       } finally {
         setIsLoading(false);
       }
@@ -88,6 +95,11 @@ export default function LoginPage() {
       <div className={styles.container}>
         <header>LOGIN FORM</header>
         <form onSubmit={handleSubmit}>
+          {message.text && (
+            <div className={message.type === 'success' ? styles.successMessage : styles.errorMessage}>
+              {message.text}
+            </div>
+          )}
           <div className={styles.field}>
             <div className={styles.inputField}>
               <input

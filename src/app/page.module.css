@@ -95,7 +95,7 @@
   border: 1.5px solid #5C8307;
   margin: 25px 0 6px;
   font-weight: 500;
-  cursor: pointer;
+  cursor: text;
   transition: all 0.3s ease;
   height: 50px;
   width: 91%;
@@ -165,9 +165,31 @@
 }
 
 .button:disabled {
-  background-color: #cccccc;
-  color: #666666;
+  background: #666;
   cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.message {
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.successMessage {
+  composes: message;
+  background: rgba(92, 131, 7, 0.2);
+  color: #5C8307;
+  border: 1px solid #5C8307;
+}
+
+.errorMessage {
+  composes: message;
+  background: rgba(255, 0, 0, 0.1);
+  color: #ff3333;
+  border: 1px solid #ff3333;
 }
 
 @media (max-width: 900px) {
@@ -201,4 +223,4 @@
   .error {
     font-size: 12px;
   }
-} 
+}
