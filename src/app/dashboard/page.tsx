@@ -142,7 +142,7 @@ export default function AdminDashboard() {
         <div className={styles.dashboardContainer}>
             <div className={styles.header}>
                 <h1 className={styles.title}>
-                    <DashboardOutlined /> Admin Dashboard
+                    <DashboardOutlined /> EduConnect Admin Dashboard
                 </h1>
                 <button
                     onClick={handleLogout}
@@ -181,7 +181,11 @@ export default function AdminDashboard() {
                                     <CrownOutlined /> Admins
                                 </span>
                             ),
-                            children: <AdminTable initialData={dummyAdmins} />,
+                            children: (
+                                <div>
+                                    <AdminTable initialData={dummyAdmins} />
+                                </div>
+                            ),
                         },
                     ]}
                 />

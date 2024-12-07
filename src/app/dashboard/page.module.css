@@ -75,5 +75,88 @@
 }
 
 .tabsContainer :global(.ant-tabs-nav::before) {
-  border-bottom: 2px solid #eee;
+  border-bottom: none !important;
+}
+
+.tabsContainer :global(.ant-tabs-tab) {
+  margin: 0 16px !important;
+  padding: 8px 16px !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+  background: #f0f0f0 !important;
+}
+
+.tabsContainer :global(.ant-tabs-tab:hover) {
+  background: rgba(92, 131, 7, 0.1) !important;
+  transform: translateY(-1px);
+}
+
+.tabsContainer :global(.ant-tabs-tab-active) {
+  background: #5C8307 !important;
+}
+
+.tabsContainer :global(.ant-tabs-ink-bar) {
+  display: none !important;
+}
+
+.tabsContainer :global(.ant-tabs-tab-active .ant-tabs-tab-btn) {
+  color: white !important;
+  font-weight: 600 !important;
+}
+
+.tabsContainer :global(.ant-table-row) {
+  transition: all 0.3s ease !important;
+}
+
+.tabsContainer :global(.ant-table-row:hover) {
+  background: rgba(92, 131, 7, 0.05) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tabsContainer :global(.ant-table-cell) {
+  padding: 16px !important;
+}
+
+.addButton {
+  margin-bottom: 16px;
+  background: #5C8307;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.addButton:hover {
+  background: #6c9908;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(92, 131, 7, 0.2);
+}
+
+.tabsContainer :global(.ant-table-thead > tr > th) {
+  background: #6c9908 !important;
+  font-weight: 600 !important;
+  font-size: 16px;
+}
+
+.tabsContainer :global(.ant-table) {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+
+.tabsContainer :global(.ant-btn) {
+  transition: all 0.3s ease !important;
+}
+
+.tabsContainer :global(.ant-btn:hover) {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 2px 4px rgba(92, 131, 7, 0.2) !important;
+  opacity: 0.9 !important;
 }
