@@ -23,34 +23,34 @@ export default function AdminDashboard() {
     useEffect(() => {
         // Redirect if not logged in
         if (!user) {
+            console.log('No user found, redirecting to login');
             router.push('/');
             return;
         }
 
+        console.log('Current user:', user);
+
         // Fetch data from Firebase
         const fetchData = async () => {
             try {
+                setLoading(true);
+                console.log('Starting data fetch...');
+
                 const [studentsData, tutorsData, adminsData] = await Promise.all([
                     getStudents(),
                     getTutors(),
                     getAdmins()
                 ]);
 
-                // Convert objects to arrays with IDs
-                setStudents(Object.entries(studentsData).map(([id, data]) => ({
-                    id,
-                    ...data as Omit<Student, 'id'>
-                })));
-                
-                setTutors(Object.entries(tutorsData).map(([id, data]) => ({
-                    id,
-                    ...data as Omit<Tutor, 'id'>
-                })));
-                
-                setAdmins(Object.entries(adminsData).map(([id, data]) => ({
-                    id,
-                    ...data as Omit<Admin, 'id'>
-                })));
+                console.log('Fetched data:', {
+                    students: studentsData,
+                    tutors: tutorsData,
+                    admins: adminsData
+                });
+
+                setStudents(studentsData);
+                setTutors(tutorsData);
+                setAdmins(adminsData);
             } catch (error) {
                 console.error('Error fetching data:', error);
             } finally {
@@ -66,9 +66,48 @@ export default function AdminDashboard() {
             await logout();
             router.push('/');
         } catch (error) {
-            console.error('Logout error:', error);
+            console.error('Error logging out:', error);
         }
     };
+
+    console.log('Current state:', { students, tutors, admins, loading });
+
+    const items = [
+        {
+            key: '1',
+            label: (
+                <span>
+                    <UserOutlined />
+                    Students ({students.length})
+                </span>
+            ),
+            children: <StudentTable students={students} loading={loading} />
+        },
+        {
+            key: '2',
+            label: (
+                <span>
+                    <TeamOutlined />
+                    Tutors ({tutors.length})
+                </span>
+            ),
+            children: <TutorTable tutors={tutors} loading={loading} />
+        },
+        {
+            key: '3',
+            label: (
+                <span>
+                    <CrownOutlined />
+                    Admins ({admins.length})
+                </span>
+            ),
+            children: <AdminTable admins={admins} loading={loading} />
+        }
+    ];
+
+    if (!user) {
+        return null;
+    }
 
     if (loading) {
         return <div>Loading...</div>;
@@ -84,40 +123,8 @@ export default function AdminDashboard() {
                     <LogoutOutlined /> Logout
                 </button>
             </div>
-
             <div className={styles.tabsContainer}>
-                <Tabs
-                    defaultActiveKey="students"
-                    items={[
-                        {
-                            key: 'students',
-                            label: (
-                                <span>
-                                    <UserOutlined /> Students
-                                </span>
-                            ),
-                            children: <StudentTable initialData={students} />,
-                        },
-                        {
-                            key: 'tutors',
-                            label: (
-                                <span>
-                                    <TeamOutlined /> Tutors
-                                </span>
-                            ),
-                            children: <TutorTable initialData={tutors} />,
-                        },
-                        {
-                            key: 'admins',
-                            label: (
-                                <span>
-                                    <CrownOutlined /> Admins
-                                </span>
-                            ),
-                            children: <AdminTable initialData={admins} />,
-                        },
-                    ]}
-                />
+                <Tabs defaultActiveKey="1" items={items} className={styles.tabs} />
             </div>
         </div>
     );

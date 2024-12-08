@@ -1,41 +1,71 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { Table, Modal, Form, Input, Button } from 'antd';
+import { Table, Modal, Form, Input, Button, Spin } from 'antd';
 import type { Student } from '@/types';
 
-// Add this to the component props
 interface StudentTableProps {
-    initialData: Student[];
+    students: Student[];
+    loading?: boolean;
 }
 
-export default function StudentTable({ initialData }: StudentTableProps) {
+export default function StudentTable({ students, loading = false }: StudentTableProps) {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
     const [form] = Form.useForm();
 
     const columns = [
-        { title: 'Name', dataIndex: 'name', key: 'name' },
-        { title: 'Cell No.', dataIndex: 'cellNo', key: 'cellNo' },
-        { title: 'City', dataIndex: 'city', key: 'city' },
-        { title: 'Country', dataIndex: 'country', key: 'country' },
-        {
-            title: 'Tutoring Requests',
-            dataIndex: 'tutoringRequests',
-            key: 'tutoringRequests',
-            render: (requests: any[]) => (
-                <div>
-                    {requests.map((request, index) => (
-                        <div key={index} className="mb-2 p-2 bg-[#FFFFE0] rounded">
-                            <div><strong>Subject:</strong> {request.subject}</div>
-                            <div><strong>Hours:</strong> {request.hours}</div>
-                            <div><strong>Fees:</strong> ${request.fees}</div>
-                            <div><strong>Description:</strong> {request.description}</div>
-                        </div>
-                    ))}
-                </div>
-            ),
+        { 
+            title: 'Full Name', 
+            dataIndex: 'fullName', 
+            key: 'fullName',
+            sorter: (a: Student, b: Student) => a.fullName.localeCompare(b.fullName)
         },
+        { 
+            title: 'Email', 
+            dataIndex: 'email', 
+            key: 'email' 
+        },
+        { 
+            title: 'Phone Number', 
+            dataIndex: 'phoneNumber', 
+            key: 'phoneNumber' 
+        },
+        { 
+            title: 'Category', 
+            dataIndex: 'category', 
+            key: 'category',
+            filters: [
+                { text: 'Undergraduate', value: 'Undergraduate' },
+                { text: 'Graduate', value: 'Graduate' },
+                { text: 'High School', value: 'High School' }
+            ],
+            onFilter: (value: string, record: Student) => record.category === value
+        },
+        { 
+            title: 'City', 
+            dataIndex: 'city', 
+            key: 'city',
+            sorter: (a: Student, b: Student) => a.city.localeCompare(b.city)
+        },
+        { 
+            title: 'Country', 
+            dataIndex: 'country', 
+            key: 'country',
+            sorter: (a: Student, b: Student) => a.country.localeCompare(b.country)
+        },
+        { 
+            title: 'Institute', 
+            dataIndex: 'institute', 
+            key: 'institute' 
+        },
+        {
+            title: 'Last Updated',
+            dataIndex: 'updatedAt',
+            key: 'updatedAt',
+            render: (date: string) => new Date(date).toLocaleDateString(),
+            sorter: (a: Student, b: Student) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+        }
     ];
 
     useEffect(() => {
@@ -49,114 +79,58 @@ export default function StudentTable({ initialData }: StudentTableProps) {
         setIsModalVisible(true);
     }, []);
 
-    const handleSave = useCallback(async (values: any) => {
-        console.log('Updated values:', values);
-        setIsModalVisible(false);
-        setSelectedStudent(null);
-        form.resetFields();
-    }, [form]);
-
     const handleCancel = useCallback(() => {
         setIsModalVisible(false);
         setSelectedStudent(null);
         form.resetFields();
     }, [form]);
 
+    console.log('StudentTable render:', { students, loading });
+
     return (
         <div>
             <Table
-                rowKey="id"
+                dataSource={students}
                 columns={columns}
-                dataSource={initialData}
+                rowKey="id"
+                loading={loading}
                 onRow={(record) => ({
-                    onClick: () => handleRowClick(record),
+                    onClick: () => handleRowClick(record)
                 })}
-                rowClassName="cursor-pointer hover:bg-[#F9F1A5]"
+                pagination={{
+                    defaultPageSize: 10,
+                    showSizeChanger: true,
+                    showTotal: (total) => `Total ${total} students`
+                }}
             />
 
             <Modal
-                title="Edit Student Information"
+                title="Student Details"
                 open={isModalVisible}
                 onCancel={handleCancel}
                 footer={null}
-                destroyOnClose
-                maskClosable={false}
-                width={800}
             >
-                <Form
-                    form={form}
-                    onFinish={handleSave}
-                    layout="vertical"
-                >
-                    <Form.Item name="name" label="Name" rules={[{ required: true }]}>
-                        <Input />
+                <Form form={form} layout="vertical">
+                    <Form.Item label="Full Name" name="fullName">
+                        <Input readOnly />
                     </Form.Item>
-                    <Form.Item name="cellNo" label="Cell No." rules={[{ required: true }]}>
-                        <Input />
+                    <Form.Item label="Email" name="email">
+                        <Input readOnly />
                     </Form.Item>
-                    <Form.Item name="city" label="City" rules={[{ required: true }]}>
-                        <Input />
+                    <Form.Item label="Phone Number" name="phoneNumber">
+                        <Input readOnly />
                     </Form.Item>
-                    <Form.Item name="country" label="Country" rules={[{ required: true }]}>
-                        <Input />
+                    <Form.Item label="Category" name="category">
+                        <Input readOnly />
                     </Form.Item>
-
-                    {/* Add Form List for Tutoring Requests */}
-                    <Form.List name="tutoringRequests">
-                        {(fields, { add, remove }) => (
-                            <>
-                                {fields.map(({ key, name, ...restField }) => (
-                                    <div key={key} className="p-4 border rounded mb-4 bg-[#FFFFE0]">
-                                        <Form.Item
-                                            {...restField}
-                                            name={[name, 'subject']}
-                                            label="Subject"
-                                            rules={[{ required: true }]}
-                                        >
-                                            <Input />
-                                        </Form.Item>
-                                        <Form.Item
-                                            {...restField}
-                                            name={[name, 'hours']}
-                                            label="Hours"
-                                            rules={[{ required: true }]}
-                                        >
-                                            <Input type="number" />
-                                        </Form.Item>
-                                        <Form.Item
-                                            {...restField}
-                                            name={[name, 'fees']}
-                                            label="Fees"
-                                            rules={[{ required: true }]}
-                                        >
-                                            <Input type="number" prefix="$" />
-                                        </Form.Item>
-                                        <Form.Item
-                                            {...restField}
-                                            name={[name, 'description']}
-                                            label="Description"
-                                            rules={[{ required: true }]}
-                                        >
-                                            <Input.TextArea />
-                                        </Form.Item>
-                                        <Button type="dashed" onClick={() => remove(name)} danger>
-                                            Remove Request
-                                        </Button>
-                                    </div>
-                                ))}
-                                <Form.Item>
-                                    <Button type="dashed" onClick={() => add()} block>
-                                        Add Tutoring Request
-                                    </Button>
-                                </Form.Item>
-                            </>
-                        )}
-                    </Form.List>
-
-                    <Form.Item>
-                        <Button type="primary" htmlType="submit">
-                            Save Changes
-                        </Button>
+                    <Form.Item label="City" name="city">
+                        <Input readOnly />
+                    </Form.Item>
+                    <Form.Item label="Country" name="country">
+                        <Input readOnly />
+                    </Form.Item>
+                    <Form.Item label="Institute" name="institute">
+                        <Input readOnly />
                     </Form.Item>
                 </Form>
             </Modal>
