@@ -101,7 +101,41 @@ export default function AdminDashboard() {
                     Admins ({admins.length})
                 </span>
             ),
-            children: <AdminTable admins={admins} loading={loading} />
+            children: <AdminTable 
+                admins={admins} 
+                loading={loading} 
+                onAdminAdded={() => {
+                    // Refresh data when a new admin is added
+                    const fetchData = async () => {
+                        try {
+                            setLoading(true);
+                            console.log('Starting data fetch...');
+
+                            const [studentsData, tutorsData, adminsData] = await Promise.all([
+                                getStudents(),
+                                getTutors(),
+                                getAdmins()
+                            ]);
+
+                            console.log('Fetched data:', {
+                                students: studentsData,
+                                tutors: tutorsData,
+                                admins: adminsData
+                            });
+
+                            setStudents(studentsData);
+                            setTutors(tutorsData);
+                            setAdmins(adminsData);
+                        } catch (error) {
+                            console.error('Error fetching data:', error);
+                        } finally {
+                            setLoading(false);
+                        }
+                    };
+
+                    fetchData();
+                }}
+            />
         }
     ];
 

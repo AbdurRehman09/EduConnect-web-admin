@@ -3,16 +3,21 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Table, Modal, Form, Input, Tag, Button, Select, message } from 'antd';
 import type { Admin } from '@/types';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
 
 interface AdminTableProps {
     admins: Admin[];
     loading?: boolean;
+    onAdminAdded?: () => void;
 }
 
-export default function AdminTable({ admins, loading = false }: AdminTableProps) {
+export default function AdminTable({ admins, loading = false, onAdminAdded }: AdminTableProps) {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedAdmin, setSelectedAdmin] = useState<Admin | null>(null);
     const [isAddMode, setIsAddMode] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [form] = Form.useForm();
 
     const columns = [
@@ -72,16 +77,43 @@ export default function AdminTable({ admins, loading = false }: AdminTableProps)
 
     const handleSave = useCallback(async (values: any) => {
         try {
-            console.log('Updated/Added values:', values);
-            message.success(`Admin ${isAddMode ? 'added' : 'updated'} successfully`);
+            setIsSubmitting(true);
+            if (isAddMode) {
+                // Create authentication user
+                const userCredential = await createUserWithEmailAndPassword(
+                    auth,
+                    values.email,
+                    values.password
+                );
+
+                // Create admin document in Firestore
+                const adminData: Omit<Admin, 'id'> = {
+                    name: values.name,
+                    email: values.email,
+                    role: values.role,
+                    lastLogin: new Date().toISOString()
+                };
+
+                await setDoc(doc(db, 'admins', userCredential.user.uid), adminData);
+
+                message.success('Admin added successfully');
+                onAdminAdded?.(); // Refresh the admin list
+            } else {
+                // Handle admin update if needed
+                console.log('Updated values:', values);
+                message.success('Admin updated successfully');
+            }
+
             setIsModalVisible(false);
             setSelectedAdmin(null);
             form.resetFields();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error saving admin:', error);
-            message.error('Failed to save admin');
+            message.error(error.message || 'Failed to save admin');
+        } finally {
+            setIsSubmitting(false);
         }
-    }, [form, isAddMode]);
+    }, [form, isAddMode, onAdminAdded]);
 
     const handleCancel = useCallback(() => {
         setIsModalVisible(false);
@@ -133,6 +165,7 @@ export default function AdminTable({ admins, loading = false }: AdminTableProps)
                         type="primary"
                         onClick={() => form.submit()}
                         style={{ backgroundColor: '#5C8307' }}
+                        loading={isSubmitting}
                     >
                         {isAddMode ? 'Add Admin' : 'Save Changes'}
                     </Button>
