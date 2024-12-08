@@ -8,43 +8,52 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: clamp(1rem, 3vw, 2rem);
-  background: white;
-  padding: clamp(1rem, 2vw, 1.5rem);
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  flex-wrap: wrap;
-  gap: 1rem;
+  padding: 1rem 2rem;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
 }
 
 .title {
-  font-size: clamp(1.25rem, 4vw, 2rem);
-  font-weight: 700;
+  margin: 0;
+  font-size: 1.5rem;
   color: #5C8307;
+}
+
+.userSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.userInfo {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #5C8307;
+  transition: all 0.3s ease;
+}
+
+.userInfo:hover {
+  background-color: rgba(92, 131, 7, 0.1);
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.menuIcon {
+  color: #5C8307;
 }
 
 .logoutButton {
-  background: #ff4d4f;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: clamp(0.875rem, 2vw, 1rem);
-}
-
-.logoutButton:hover {
-  background: #ff7875;
-  transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(255, 77, 79, 0.2);
+  display: none;
 }
 
 .tabsContainer {
@@ -145,11 +154,6 @@
 }
 
 @media (max-width: 480px) {
-  .logoutButton {
-    width: 100%;
-    justify-content: center;
-  }
-
   .tabsContainer {
     padding: 0.75rem;
   }

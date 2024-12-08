@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Tabs } from 'antd';
-import { LogoutOutlined, DashboardOutlined, UserOutlined, TeamOutlined, CrownOutlined } from '@ant-design/icons';
+import { Tabs, Dropdown, Space } from 'antd';
+import { LogoutOutlined, DashboardOutlined, UserOutlined, TeamOutlined, CrownOutlined, DownOutlined } from '@ant-design/icons';
 import StudentTable from '@/components/StudentTable';
 import TutorTable from '@/components/TutorTable';
 import AdminTable from '@/components/AdminTable';
@@ -17,6 +17,7 @@ export default function AdminDashboard() {
     const [tutors, setTutors] = useState<Tutor[]>([]);
     const [admins, setAdmins] = useState<Admin[]>([]);
     const [loading, setLoading] = useState(true);
+    const [currentAdmin, setCurrentAdmin] = useState<Admin | null>(null);
     const router = useRouter();
     const { logout, user } = useAuth();
 
@@ -48,6 +49,10 @@ export default function AdminDashboard() {
                     admins: adminsData
                 });
 
+                // Find current admin
+                const currentAdminData = adminsData.find(admin => admin.email === user.email);
+                setCurrentAdmin(currentAdminData || null);
+
                 setStudents(studentsData);
                 setTutors(tutorsData);
                 setAdmins(adminsData);
@@ -70,7 +75,34 @@ export default function AdminDashboard() {
         }
     };
 
-    console.log('Current state:', { students, tutors, admins, loading });
+    const userMenuItems = [
+        {
+            key: 'email',
+            label: (
+                <div className={styles.menuItem}>
+                    <UserOutlined className={styles.menuIcon} />
+                    <span>{user?.email}</span>
+                </div>
+            ),
+        },
+        {
+            key: 'role',
+            label: (
+                <div className={styles.menuItem}>
+                    <CrownOutlined className={styles.menuIcon} />
+                    <span>{currentAdmin?.role?.toUpperCase() || 'ADMIN'}</span>
+                </div>
+            ),
+        },
+        { type: 'divider' },
+        {
+            key: 'logout',
+            danger: true,
+            icon: <LogoutOutlined />,
+            label: 'Logout',
+            onClick: handleLogout,
+        },
+    ];
 
     const items = [
         {
@@ -153,6 +185,21 @@ export default function AdminDashboard() {
                 <h1 className={styles.title}>
                     <DashboardOutlined /> Admin Dashboard
                 </h1>
+                <div className={styles.userSection}>
+                    <Dropdown 
+                        menu={{ items: userMenuItems }} 
+                        trigger={['hover']}
+                        placement="bottomRight"
+                    >
+                        <a onClick={(e) => e.preventDefault()}>
+                            <Space className={styles.userInfo}>
+                                <UserOutlined />
+                                <span>{currentAdmin?.name || 'Admin'}</span>
+                                <DownOutlined />
+                            </Space>
+                        </a>
+                    </Dropdown>
+                </div>
                 <button onClick={handleLogout} className={styles.logoutButton}>
                     <LogoutOutlined /> Logout
                 </button>
