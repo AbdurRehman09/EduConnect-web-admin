@@ -1,24 +1,110 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { Table, Modal, Form, Input, Tag, Button, Select, message } from 'antd';
+import { Table, Modal, Form, Input, Tag, Button, Select, message, Space } from 'antd';
+import { EditOutlined, DeleteOutlined, UserAddOutlined } from '@ant-design/icons';
 import type { Admin } from '@/types';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { createUserWithEmailAndPassword, deleteUser, getAuth } from 'firebase/auth';
+import { doc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 
 interface AdminTableProps {
     admins: Admin[];
     loading?: boolean;
-    onAdminAdded?: () => void;
+    isEditable?: boolean;
+    onDataChange?: () => void;
 }
 
-export default function AdminTable({ admins, loading = false, onAdminAdded }: AdminTableProps) {
+export default function AdminTable({ 
+    admins, 
+    loading = false,
+    isEditable = false,
+    onDataChange 
+}: AdminTableProps) {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedAdmin, setSelectedAdmin] = useState<Admin | null>(null);
-    const [isAddMode, setIsAddMode] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [form] = Form.useForm();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isAddMode, setIsAddMode] = useState(false);
+
+    const handleAdd = () => {
+        if (!isEditable) {
+            message.error('You do not have permission to add admins');
+            return;
+        }
+        setIsAddMode(true);
+        setSelectedAdmin(null);
+        form.resetFields();
+        setIsModalVisible(true);
+    };
+
+    const handleEdit = (admin: Admin) => {
+        if (!isEditable) {
+            message.error('You do not have permission to edit admins');
+            return;
+        }
+        setIsAddMode(false);
+        setSelectedAdmin(admin);
+        form.setFieldsValue(admin);
+        setIsModalVisible(true);
+    };
+
+    const handleDelete = async (admin: Admin) => {
+        if (!isEditable) {
+            message.error('You do not have permission to delete admins');
+            return;
+        }
+        try {
+            // Delete from Firestore first
+            await deleteDoc(doc(db, 'admins', admin.id));
+            message.success('Admin deleted successfully');
+            onDataChange?.();
+        } catch (error: any) {
+            console.error('Error deleting admin:', error);
+            message.error(error.message || 'Failed to delete admin');
+        }
+    };
+
+    const handleSave = async (values: any) => {
+        try {
+            setIsSubmitting(true);
+            if (isAddMode) {
+                // Create authentication user
+                const userCredential = await createUserWithEmailAndPassword(
+                    auth,
+                    values.email,
+                    values.password
+                );
+
+                // Create admin document in Firestore
+                const adminData = {
+                    name: values.name,
+                    email: values.email,
+                    role: values.role,
+                    lastLogin: new Date().toISOString()
+                };
+
+                await setDoc(doc(db, 'admins', userCredential.user.uid), adminData);
+                message.success('Admin added successfully');
+            } else if (selectedAdmin) {
+                // Update existing admin
+                await updateDoc(doc(db, 'admins', selectedAdmin.id), {
+                    ...values,
+                    updatedAt: new Date().toISOString()
+                });
+                message.success('Admin updated successfully');
+            }
+
+            setIsModalVisible(false);
+            form.resetFields();
+            onDataChange?.();
+        } catch (error: any) {
+            console.error('Error saving admin:', error);
+            message.error(error.message || 'Failed to save admin');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     const columns = [
         { 
@@ -75,78 +161,58 @@ export default function AdminTable({ admins, loading = false, onAdminAdded }: Ad
         setIsModalVisible(true);
     };
 
-    const handleSave = useCallback(async (values: any) => {
-        try {
-            setIsSubmitting(true);
-            if (isAddMode) {
-                // Create authentication user
-                const userCredential = await createUserWithEmailAndPassword(
-                    auth,
-                    values.email,
-                    values.password
-                );
-
-                // Create admin document in Firestore
-                const adminData: Omit<Admin, 'id'> = {
-                    name: values.name,
-                    email: values.email,
-                    role: values.role,
-                    lastLogin: new Date().toISOString()
-                };
-
-                await setDoc(doc(db, 'admins', userCredential.user.uid), adminData);
-
-                message.success('Admin added successfully');
-                onAdminAdded?.(); // Refresh the admin list
-            } else {
-                // Handle admin update if needed
-                console.log('Updated values:', values);
-                message.success('Admin updated successfully');
-            }
-
-            setIsModalVisible(false);
-            setSelectedAdmin(null);
-            form.resetFields();
-        } catch (error: any) {
-            console.error('Error saving admin:', error);
-            message.error(error.message || 'Failed to save admin');
-        } finally {
-            setIsSubmitting(false);
+    const columnsWithActions = isEditable ? [
+        ...columns,
+        {
+            title: 'Actions',
+            key: 'actions',
+            render: (_: any, record: Admin) => (
+                <Space onClick={(e) => e.stopPropagation()}>
+                    <Button 
+                        type="text" 
+                        icon={<EditOutlined />} 
+                        onClick={() => handleEdit(record)}
+                    />
+                    <Button 
+                        type="text" 
+                        danger 
+                        icon={<DeleteOutlined />} 
+                        onClick={() => handleDelete(record)}
+                    />
+                </Space>
+            )
         }
-    }, [form, isAddMode, onAdminAdded]);
-
-    const handleCancel = useCallback(() => {
-        setIsModalVisible(false);
-        setSelectedAdmin(null);
-        setIsAddMode(false);
-        form.resetFields();
-    }, [form]);
-
-    console.log('AdminTable render:', { admins, loading });
+    ] : columns;
 
     return (
         <div>
-            <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end' }}>
-                <Button
-                    type="primary"
+            {isEditable && (
+                <Button 
+                    type="primary" 
+                    icon={<UserAddOutlined />} 
                     onClick={handleAddNew}
-                    style={{ backgroundColor: '#5C8307' }}
-                    icon={<span className="anticon">+</span>}
+                    style={{ marginBottom: 16 }}
                 >
                     Add New Admin
                 </Button>
-            </div>
+            )}
 
             <Table
                 dataSource={admins}
-                columns={columns}
+                columns={columnsWithActions}
                 rowKey="id"
                 loading={loading}
                 onRow={(record) => ({
-                    onClick: () => handleRowClick(record)
+                    onClick: () => {
+                        if (isEditable) {
+                            setSelectedAdmin(record);
+                            setIsModalVisible(true);
+                        }
+                    },
+                    style: { cursor: isEditable ? 'pointer' : 'default' }
                 })}
                 pagination={{
-                    defaultPageSize: 10,
+                    pageSize: 10,
                     showSizeChanger: true,
                     showTotal: (total) => `Total ${total} admins`
                 }}
@@ -155,9 +221,19 @@ export default function AdminTable({ admins, loading = false, onAdminAdded }: Ad
             <Modal
                 title={isAddMode ? "Add New Admin" : "Admin Details"}
                 open={isModalVisible}
-                onCancel={handleCancel}
+                onCancel={() => {
+                    setIsModalVisible(false);
+                    setSelectedAdmin(null);
+                    setIsAddMode(false);
+                    form.resetFields();
+                }}
                 footer={isAddMode ? [
-                    <Button key="cancel" onClick={handleCancel}>
+                    <Button key="cancel" onClick={() => {
+                        setIsModalVisible(false);
+                        setSelectedAdmin(null);
+                        setIsAddMode(false);
+                        form.resetFields();
+                    }}>
                         Cancel
                     </Button>,
                     <Button

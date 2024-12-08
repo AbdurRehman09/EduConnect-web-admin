@@ -1,18 +1,69 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { Table, Modal, Form, Input, Button, Spin } from 'antd';
+import { Table, Modal, Form, Input, message, Button, Space } from 'antd';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { Student } from '@/types';
+import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 interface StudentTableProps {
     students: Student[];
     loading?: boolean;
+    isEditable?: boolean;
+    onDataChange?: () => void;
 }
 
-export default function StudentTable({ students, loading = false }: StudentTableProps) {
+export default function StudentTable({ 
+    students, 
+    loading = false, 
+    isEditable = false,
+    onDataChange 
+}: StudentTableProps) {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
     const [form] = Form.useForm();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleEdit = (student: Student) => {
+        setSelectedStudent(student);
+        form.setFieldsValue(student);
+        setIsModalVisible(true);
+    };
+
+    const handleDelete = async (student: Student) => {
+        try {
+            // Delete from Firestore first
+            await deleteDoc(doc(db, 'students', student.id));
+            message.success('Student deleted successfully');
+            onDataChange?.();
+        } catch (error: any) {
+            console.error('Error deleting student:', error);
+            message.error(error.message || 'Failed to delete student');
+        }
+    };
+
+    const handleSave = async (values: any) => {
+        try {
+            setIsSubmitting(true);
+            if (!selectedStudent) return;
+
+            await updateDoc(doc(db, 'students', selectedStudent.id), {
+                ...values,
+                updatedAt: new Date().toISOString()
+            });
+
+            message.success('Student updated successfully');
+            setIsModalVisible(false);
+            form.resetFields();
+            onDataChange?.();
+        } catch (error) {
+            console.error('Error updating student:', error);
+            message.error('Failed to update student');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     const columns = [
         { 
@@ -65,8 +116,27 @@ export default function StudentTable({ students, loading = false }: StudentTable
             key: 'updatedAt',
             render: (date: string) => new Date(date).toLocaleDateString(),
             sorter: (a: Student, b: Student) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+        },
+        isEditable && {
+            title: 'Actions',
+            key: 'actions',
+            render: (_: any, record: Student) => (
+                <Space onClick={(e) => e.stopPropagation()}>
+                    <Button 
+                        type="text" 
+                        icon={<EditOutlined />} 
+                        onClick={() => handleEdit(record)}
+                    />
+                    <Button 
+                        type="text" 
+                        danger 
+                        icon={<DeleteOutlined />} 
+                        onClick={() => handleDelete(record)}
+                    />
+                </Space>
+            )
         }
-    ];
+    ].filter(Boolean);
 
     useEffect(() => {
         if (selectedStudent && isModalVisible) {
@@ -88,52 +158,94 @@ export default function StudentTable({ students, loading = false }: StudentTable
     console.log('StudentTable render:', { students, loading });
 
     return (
-        <div>
-            <Table
-                dataSource={students}
+        <>
+            <Table 
+                dataSource={students} 
                 columns={columns}
-                rowKey="id"
                 loading={loading}
+                rowKey="id"
                 onRow={(record) => ({
-                    onClick: () => handleRowClick(record)
+                    onClick: () => {
+                        if (isEditable) {
+                            setSelectedStudent(record);
+                            setIsModalVisible(true);
+                        }
+                    },
+                    style: { cursor: isEditable ? 'pointer' : 'default' }
                 })}
                 pagination={{
-                    defaultPageSize: 10,
+                    pageSize: 10,
                     showSizeChanger: true,
                     showTotal: (total) => `Total ${total} students`
                 }}
             />
 
             <Modal
-                title="Student Details"
+                title="Edit Student"
                 open={isModalVisible}
+                onOk={form.submit}
                 onCancel={handleCancel}
-                footer={null}
+                confirmLoading={isSubmitting}
             >
-                <Form form={form} layout="vertical">
-                    <Form.Item label="Full Name" name="fullName">
-                        <Input readOnly />
+                <Form
+                    form={form}
+                    layout="vertical"
+                    onFinish={handleSave}
+                >
+                    <Form.Item
+                        name="fullName"
+                        label="Full Name"
+                        rules={[{ required: true, message: 'Please input student full name!' }]}
+                    >
+                        <Input />
                     </Form.Item>
-                    <Form.Item label="Email" name="email">
-                        <Input readOnly />
+                    <Form.Item
+                        name="email"
+                        label="Email"
+                        rules={[
+                            { required: true, message: 'Please input student email!' },
+                            { type: 'email', message: 'Please enter a valid email!' }
+                        ]}
+                    >
+                        <Input />
                     </Form.Item>
-                    <Form.Item label="Phone Number" name="phoneNumber">
-                        <Input readOnly />
+                    <Form.Item
+                        name="phoneNumber"
+                        label="Phone Number"
+                        rules={[{ required: true, message: 'Please input student phone number!' }]}
+                    >
+                        <Input />
                     </Form.Item>
-                    <Form.Item label="Category" name="category">
-                        <Input readOnly />
+                    <Form.Item
+                        name="category"
+                        label="Category"
+                        rules={[{ required: true, message: 'Please select student category!' }]}
+                    >
+                        <Input />
                     </Form.Item>
-                    <Form.Item label="City" name="city">
-                        <Input readOnly />
+                    <Form.Item
+                        name="city"
+                        label="City"
+                        rules={[{ required: true, message: 'Please input student city!' }]}
+                    >
+                        <Input />
                     </Form.Item>
-                    <Form.Item label="Country" name="country">
-                        <Input readOnly />
+                    <Form.Item
+                        name="country"
+                        label="Country"
+                        rules={[{ required: true, message: 'Please input student country!' }]}
+                    >
+                        <Input />
                     </Form.Item>
-                    <Form.Item label="Institute" name="institute">
-                        <Input readOnly />
+                    <Form.Item
+                        name="institute"
+                        label="Institute"
+                        rules={[{ required: true, message: 'Please input student institute!' }]}
+                    >
+                        <Input />
                     </Form.Item>
                 </Form>
             </Modal>
-        </div>
+        </>
     );
 }

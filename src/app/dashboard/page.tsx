@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tabs, Dropdown, Space } from 'antd';
 import { LogoutOutlined, DashboardOutlined, UserOutlined, TeamOutlined, CrownOutlined, DownOutlined } from '@ant-design/icons';
 import StudentTable from '@/components/StudentTable';
@@ -22,7 +22,6 @@ export default function AdminDashboard() {
     const { logout, user } = useAuth();
 
     useEffect(() => {
-        // Redirect if not logged in
         if (!user) {
             console.log('No user found, redirecting to login');
             router.push('/');
@@ -31,7 +30,6 @@ export default function AdminDashboard() {
 
         console.log('Current user:', user);
 
-        // Fetch data from Firebase
         const fetchData = async () => {
             try {
                 setLoading(true);
@@ -51,8 +49,14 @@ export default function AdminDashboard() {
 
                 // Find current admin
                 const currentAdminData = adminsData.find(admin => admin.email === user.email);
-                setCurrentAdmin(currentAdminData || null);
+                if (!currentAdminData) {
+                    console.error('Current user is not an admin');
+                    await logout();
+                    router.push('/');
+                    return;
+                }
 
+                setCurrentAdmin(currentAdminData);
                 setStudents(studentsData);
                 setTutors(tutorsData);
                 setAdmins(adminsData);
@@ -64,7 +68,7 @@ export default function AdminDashboard() {
         };
 
         fetchData();
-    }, [user, router]);
+    }, [user, router, logout]);
 
     const handleLogout = async () => {
         try {
@@ -77,11 +81,19 @@ export default function AdminDashboard() {
 
     const userMenuItems = [
         {
-            key: 'email',
+            key: 'name',
             label: (
                 <div className={styles.menuItem}>
                     <UserOutlined className={styles.menuIcon} />
-                    <span>{user?.email}</span>
+                    <span className={styles.menuText}>{currentAdmin?.name || 'user'}</span>
+                </div>
+            ),
+        },
+        {
+            key: 'email',
+            label: (
+                <div className={styles.menuItem}>
+                    <span className={styles.menuEmail}>{user?.email || 'user@gmail.com'}</span>
                 </div>
             ),
         },
@@ -90,19 +102,33 @@ export default function AdminDashboard() {
             label: (
                 <div className={styles.menuItem}>
                     <CrownOutlined className={styles.menuIcon} />
-                    <span>{currentAdmin?.role?.toUpperCase() || 'ADMIN'}</span>
+                    <span className={styles.menuRole}>{currentAdmin?.role?.toUpperCase() || 'ADMIN'}</span>
                 </div>
             ),
         },
-        { type: 'divider' },
         {
             key: 'logout',
-            danger: true,
-            icon: <LogoutOutlined />,
-            label: 'Logout',
+            label: (
+                <div className={styles.menuItem}>
+                    <LogoutOutlined className={styles.logoutIcon} />
+                    <span className={styles.logoutText}>Logout</span>
+                </div>
+            ),
             onClick: handleLogout,
         },
     ];
+
+    const handleDataRefresh = async () => {
+        const [studentsData, tutorsData, adminsData] = await Promise.all([
+            getStudents(),
+            getTutors(),
+            getAdmins()
+        ]);
+
+        setStudents(studentsData);
+        setTutors(tutorsData);
+        setAdmins(adminsData);
+    };
 
     const items = [
         {
@@ -113,7 +139,12 @@ export default function AdminDashboard() {
                     Students ({students.length})
                 </span>
             ),
-            children: <StudentTable students={students} loading={loading} />
+            children: <StudentTable 
+                students={students} 
+                loading={loading}
+                isEditable={true} // All admins can edit students
+                onDataChange={handleDataRefresh}
+            />
         },
         {
             key: '2',
@@ -123,7 +154,12 @@ export default function AdminDashboard() {
                     Tutors ({tutors.length})
                 </span>
             ),
-            children: <TutorTable tutors={tutors} loading={loading} />
+            children: <TutorTable 
+                tutors={tutors} 
+                loading={loading}
+                isEditable={true} // All admins can edit tutors
+                onDataChange={handleDataRefresh}
+            />
         },
         {
             key: '3',
@@ -135,43 +171,14 @@ export default function AdminDashboard() {
             ),
             children: <AdminTable 
                 admins={admins} 
-                loading={loading} 
-                onAdminAdded={() => {
-                    // Refresh data when a new admin is added
-                    const fetchData = async () => {
-                        try {
-                            setLoading(true);
-                            console.log('Starting data fetch...');
-
-                            const [studentsData, tutorsData, adminsData] = await Promise.all([
-                                getStudents(),
-                                getTutors(),
-                                getAdmins()
-                            ]);
-
-                            console.log('Fetched data:', {
-                                students: studentsData,
-                                tutors: tutorsData,
-                                admins: adminsData
-                            });
-
-                            setStudents(studentsData);
-                            setTutors(tutorsData);
-                            setAdmins(adminsData);
-                        } catch (error) {
-                            console.error('Error fetching data:', error);
-                        } finally {
-                            setLoading(false);
-                        }
-                    };
-
-                    fetchData();
-                }}
+                loading={loading}
+                isEditable={currentAdmin?.role === 'super_admin'} // Only super_admin can edit admins
+                onDataChange={handleDataRefresh}
             />
         }
     ];
 
-    if (!user) {
+    if (!user || !currentAdmin) {
         return null;
     }
 
@@ -187,15 +194,18 @@ export default function AdminDashboard() {
                 </h1>
                 <div className={styles.userSection}>
                     <Dropdown 
-                        menu={{ items: userMenuItems }} 
+                        menu={{ 
+                            items: userMenuItems,
+                            className: styles.dropdownMenu
+                        }} 
                         trigger={['hover']}
                         placement="bottomRight"
                     >
                         <a onClick={(e) => e.preventDefault()}>
                             <Space className={styles.userInfo}>
                                 <UserOutlined />
-                                <span>{currentAdmin?.name || 'Admin'}</span>
-                                <DownOutlined />
+                                <span>{currentAdmin.name}</span>
+                                <DownOutlined className={styles.dropdownArrow} />
                             </Space>
                         </a>
                     </Dropdown>
