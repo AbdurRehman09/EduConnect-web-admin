@@ -7,10 +7,11 @@
   min-height: 100vh;
   background: #000;
   font-family: "Poppins", sans-serif;
+  padding: 1rem;
 }
 
 .section {
-  position: absolute;
+  position: fixed;
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -19,6 +20,8 @@
   gap: 2px;
   flex-wrap: wrap;
   overflow: hidden;
+  top: 0;
+  left: 0;
 }
 
 .section::before {
@@ -55,10 +58,10 @@
 }
 
 .container {
-  position: absolute;
-  max-width: 380px;
+  position: relative;
   width: 100%;
-  padding: 25px;
+  max-width: 380px;
+  padding: 1.5rem;
   border-radius: 8px;
   background: #222;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9);
@@ -66,40 +69,31 @@
 }
 
 .container header {
-  font-size: 35px;
+  font-size: clamp(1.5rem, 5vw, 2rem);
   text-align: center;
   font-weight: 600;
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
   color: #5C8307;
 }
 
-.container form {
-  margin-top: 30px;
-}
-
 .field {
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
 }
 
 .inputField {
   position: relative;
   height: 50px;
   width: 100%;
-  color: white;
 }
 
 .inputField input {
-  font-size: 16px;
+  width: 100%;
+  height: 100%;
   background: #333;
-  color: white;
   border: 1.5px solid #5C8307;
-  margin: 25px 0 6px;
-  font-weight: 500;
-  cursor: text;
-  transition: all 0.3s ease;
-  height: 50px;
-  width: 91%;
-  border-radius: 8px;
+  color: white;
+  font-size: 1rem;
+  border-radius: 6px;
   padding: 0 15px;
 }
 
@@ -111,9 +105,9 @@
 .error {
   display: flex;
   align-items: center;
-  margin-top: 8px;
-  color: #ff0000;
-  font-size: 14px;
+  margin-top: 0.5rem;
+  color: #ff3333;
+  font-size: 0.875rem;
 }
 
 .links {
@@ -140,24 +134,22 @@
 }
 
 .button {
-  margin: 25px 0 6px;
-  color: #fff;
-  font-size: 18px;
+  width: 100%;
+  height: 50px;
+  background: #5C8307;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 1rem;
   font-weight: 500;
-  background-color: #5C8307;
   cursor: pointer;
   transition: all 0.3s ease;
-  height: 50px;
-  width: 100%;
-  outline: none;
-  border: none;
-  border-radius: 8px;
-  padding: 0 15px;
 }
 
 .button:hover:not(:disabled) {
-  background-color: #4a6906;
-  transform: translateY(-1px);
+  background: #6c9908;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(92, 131, 7, 0.2);
 }
 
 .button:active:not(:disabled) {
@@ -165,9 +157,9 @@
 }
 
 .button:disabled {
-  background: #666;
-  cursor: not-allowed;
   opacity: 0.7;
+  cursor: not-allowed;
+  background: #666;
 }
 
 .message {
@@ -192,35 +184,37 @@
   border: 1px solid #ff3333;
 }
 
-@media (max-width: 900px) {
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .container {
+    padding: 1rem;
+  }
+
   .section span {
     width: calc(10vw - 2px);
     height: calc(10vw - 2px);
   }
-}
 
-@media (max-width: 600px) {
-  .section span {
-    width: calc(20vw - 2px);
-    height: calc(20vw - 2px);
+  .inputField {
+    height: 45px;
+  }
+
+  .button {
+    height: 45px;
   }
 }
 
-@media only screen and (max-width: 500px) {
-  .section {
-    width: 0vh;
-    height: 0vh;
-  }
-
-  .body {
-    font-size: 14px;
-  }
-
+@media (max-width: 320px) {
   .container {
-    width: 100%;
+    padding: 0.75rem;
   }
 
-  .error {
-    font-size: 12px;
+  .section span {
+    width: calc(12.5vw - 2px);
+    height: calc(12.5vw - 2px);
+  }
+
+  .inputField input {
+    font-size: 0.875rem;
   }
 }

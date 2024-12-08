@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './page.module.css';
-import { useAuth } from '@/components/AntdProvider';
+import { useAuth } from '@/components/providers/AuthProvider';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -14,104 +14,91 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, error } = useAuth();
 
   useEffect(() => {
     // Create spans for background effect
     const section = document.querySelector(`.${styles.section}`);
     if (section) {
-      for (let i = 1; i <= 100; i++) {
+      for (let i = 0; i < 100; i++) {
         const span = document.createElement('span');
         section.appendChild(span);
       }
     }
   }, []);
 
-  useEffect(() => {
-    if (emailError) setEmailError('');
-  }, [email]);
-
-  useEffect(() => {
-    if (passwordError) setPasswordError('');
-  }, [password]);
-
-  const checkEmail = () => {
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
       setEmailError('Email is required');
       return false;
     }
-    const emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
-    if (!email.match(emailPattern)) {
-      setEmailError('Please enter a valid email address');
+    if (!emailRegex.test(email)) {
+      setEmailError('Please enter a valid email');
       return false;
     }
+    setEmailError('');
     return true;
   };
 
-  const checkPassword = () => {
+  const validatePassword = (password: string) => {
     if (!password) {
       setPasswordError('Password is required');
       return false;
     }
     if (password.length < 6) {
-      setPasswordError('Password must be at least 6 characters long');
+      setPasswordError('Password must be at least 6 characters');
       return false;
     }
+    setPasswordError('');
     return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const isEmailValid = checkEmail();
-    const isPasswordValid = checkPassword();
     
-    if (isEmailValid && isPasswordValid) {
-      setIsLoading(true);
-      setMessage({ type: '', text: '' });
-      
-      try {
-        if (email === 'admin@educonnect.com' && password === 'admin123') {
-          setMessage({ type: 'success', text: 'Login successful! Redirecting...' });
-          document.cookie = 'auth=true; path=/';
-          login();
-          // Short delay to show success message before redirect
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          router.push('/dashboard');
-        } else {
-          setMessage({ type: 'error', text: 'Invalid email or password' });
-          setPassword('');
-        }
-      } catch (error) {
-        setMessage({ type: 'error', text: 'Login failed. Please try again.' });
-      } finally {
-        setIsLoading(false);
-      }
+    const isEmailValid = validateEmail(email);
+    const isPasswordValid = validatePassword(password);
+
+    if (!isEmailValid || !isPasswordValid) {
+      return;
+    }
+
+    setIsLoading(true);
+    setMessage({ type: '', text: '' });
+
+    try {
+      await login(email, password);
+      // Redirect will be handled by AuthProvider
+    } catch (err: any) {
+      setMessage({
+        type: 'error',
+        text: err.message || 'Failed to login. Please try again.'
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className={styles.body}>
-      <section className={styles.section}></section>
+    <main className={styles.body}>
+      <div className={styles.section}></div>
       <div className={styles.container}>
-        <header>LOGIN FORM</header>
+        <header>EduConnect Admin</header>
         <form onSubmit={handleSubmit}>
-          {message.text && (
-            <div className={message.type === 'success' ? styles.successMessage : styles.errorMessage}>
-              {message.text}
-            </div>
-          )}
           <div className={styles.field}>
             <div className={styles.inputField}>
               <input
                 type="email"
-                placeholder="Enter your email"
+                placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                onBlur={checkEmail}
+                disabled={isLoading}
               />
             </div>
             {emailError && <div className={styles.error}>{emailError}</div>}
           </div>
+
           <div className={styles.field}>
             <div className={styles.inputField}>
               <input
@@ -119,20 +106,27 @@ export default function LoginPage() {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                onBlur={checkPassword}
+                disabled={isLoading}
               />
             </div>
             {passwordError && <div className={styles.error}>{passwordError}</div>}
           </div>
-          {/* <div className={styles.links}>
-            <p>Don&apos;t have an account?</p>
-            <Link href="/signup">Signup</Link>
-          </div> */}
-          <button type="submit" className={styles.button} disabled={isLoading}>
-            {isLoading ? 'Logging in...' : 'Login Now'}
+
+          {message.text && (
+            <div className={`${styles.message} ${message.type === 'error' ? styles.error : styles.success}`}>
+              {message.text}
+            </div>
+          )}
+
+          <button 
+            type="submit" 
+            className={styles.button}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
       </div>
-    </div>
+    </main>
   );
 }

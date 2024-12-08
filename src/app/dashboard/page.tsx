@@ -1,153 +1,86 @@
 'use client';
 
-import { Tabs, Button } from 'antd';
+import { useEffect, useState } from 'react';
+import { Tabs } from 'antd';
 import { LogoutOutlined, DashboardOutlined, UserOutlined, TeamOutlined, CrownOutlined } from '@ant-design/icons';
 import StudentTable from '@/components/StudentTable';
 import TutorTable from '@/components/TutorTable';
 import AdminTable from '@/components/AdminTable';
 import { Student, Tutor, Admin } from '@/types';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/components/AntdProvider';
+import { useAuth } from '@/components/providers/AuthProvider';
+import { getStudents, getTutors, getAdmins } from '@/lib/services/database';
 import styles from './page.module.css';
 
-// Your existing dummy data...
-const dummyStudents: Student[] = [
-    {
-        id: '1',
-        name: 'John Doe',
-        cellNo: '+1-234-567-8901',
-        city: 'New York',
-        country: 'USA',
-        tutoringRequests: [
-            {
-                subject: 'Mathematics',
-                hours: 10,
-                fees: 500,
-                description: 'Need help with calculus and linear algebra',
-            },
-            {
-                subject: 'Physics',
-                hours: 8,
-                fees: 400,
-                description: 'Help needed with mechanics and thermodynamics',
-            }
-        ]
-    },
-    {
-        id: '2',
-        name: 'Jane Smith',
-        cellNo: '+1-234-567-8902',
-        city: 'London',
-        country: 'UK',
-        tutoringRequests: [
-            {
-                subject: 'Physics',
-                hours: 8,
-                fees: 400,
-                description: 'Quantum mechanics tutorials',
-            },
-            {
-                subject: 'Chemistry',
-                hours: 6,
-                fees: 350,
-                description: 'Help with organic chemistry reactions',
-            }
-        ]
-    },
-    {
-        id: '3',
-        name: 'Alice Johnson',
-        cellNo: '+1-234-567-8903',
-        city: 'Toronto',
-        country: 'Canada',
-        tutoringRequests: [
-            {
-                subject: 'Chemistry',
-                hours: 6,
-                fees: 300,
-                description: 'Organic chemistry help needed',
-            },
-            {
-                subject: 'Biology',
-                hours: 5,
-                fees: 250,
-                description: 'Help with genetics and cell biology',
-            }
-        ]
-    }
-];
-
-// Dummy data for tutors
-const dummyTutors: Tutor[] = [
-    {
-        id: '1',
-        fullName: 'Dr. Robert Wilson',
-        email: 'robert.wilson@email.com',
-        password: 'hashedPassword123',
-        phoneNumber: '+1-234-567-8904',
-        experienceLevel: 'advanced',
-        city: 'Boston',
-        country: 'USA'
-    },
-    {
-        id: '2',
-        fullName: 'Prof. Sarah Brown',
-        email: 'sarah.brown@email.com',
-        password: 'hashedPassword456',
-        phoneNumber: '+1-234-567-8905',
-        experienceLevel: 'intermediate',
-        city: 'Manchester',
-        country: 'UK'
-    },
-    {
-        id: '3',
-        fullName: 'Mr. James Lee',
-        email: 'james.lee@email.com',
-        password: 'hashedPassword789',
-        phoneNumber: '+1-234-567-8906',
-        experienceLevel: 'beginner',
-        city: 'Vancouver',
-        country: 'Canada'
-    }
-];
-// Add dummy admin data
-const dummyAdmins: Admin[] = [
-    {
-        id: '1',
-        name: 'Super Admin',
-        email: 'admin@educonnect.com',
-        role: 'super_admin',
-        lastLogin: '2024-02-20T10:00:00Z'
-    },
-    {
-        id: '2',
-        name: 'John Admin',
-        email: 'john.admin@educonnect.com',
-        role: 'admin',
-        lastLogin: '2024-02-19T15:30:00Z'
-    }
-];
-
 export default function AdminDashboard() {
+    const [students, setStudents] = useState<Student[]>([]);
+    const [tutors, setTutors] = useState<Tutor[]>([]);
+    const [admins, setAdmins] = useState<Admin[]>([]);
+    const [loading, setLoading] = useState(true);
     const router = useRouter();
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
 
-    const handleLogout = () => {
-        document.cookie = 'auth=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
-        logout();
-        router.push('/');
+    useEffect(() => {
+        // Redirect if not logged in
+        if (!user) {
+            router.push('/');
+            return;
+        }
+
+        // Fetch data from Firebase
+        const fetchData = async () => {
+            try {
+                const [studentsData, tutorsData, adminsData] = await Promise.all([
+                    getStudents(),
+                    getTutors(),
+                    getAdmins()
+                ]);
+
+                // Convert objects to arrays with IDs
+                setStudents(Object.entries(studentsData).map(([id, data]) => ({
+                    id,
+                    ...data as Omit<Student, 'id'>
+                })));
+                
+                setTutors(Object.entries(tutorsData).map(([id, data]) => ({
+                    id,
+                    ...data as Omit<Tutor, 'id'>
+                })));
+                
+                setAdmins(Object.entries(adminsData).map(([id, data]) => ({
+                    id,
+                    ...data as Omit<Admin, 'id'>
+                })));
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [user, router]);
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            router.push('/');
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
     };
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className={styles.dashboardContainer}>
             <div className={styles.header}>
                 <h1 className={styles.title}>
-                    <DashboardOutlined /> EduConnect Admin Dashboard
+                    <DashboardOutlined /> Admin Dashboard
                 </h1>
-                <button
-                    onClick={handleLogout}
-                    className={styles.logoutButton}
-                >
+                <button onClick={handleLogout} className={styles.logoutButton}>
                     <LogoutOutlined /> Logout
                 </button>
             </div>
@@ -163,7 +96,7 @@ export default function AdminDashboard() {
                                     <UserOutlined /> Students
                                 </span>
                             ),
-                            children: <StudentTable initialData={dummyStudents} />,
+                            children: <StudentTable initialData={students} />,
                         },
                         {
                             key: 'tutors',
@@ -172,7 +105,7 @@ export default function AdminDashboard() {
                                     <TeamOutlined /> Tutors
                                 </span>
                             ),
-                            children: <TutorTable initialData={dummyTutors} />,
+                            children: <TutorTable initialData={tutors} />,
                         },
                         {
                             key: 'admins',
@@ -181,11 +114,7 @@ export default function AdminDashboard() {
                                     <CrownOutlined /> Admins
                                 </span>
                             ),
-                            children: (
-                                <div>
-                                    <AdminTable initialData={dummyAdmins} />
-                                </div>
-                            ),
+                            children: <AdminTable initialData={admins} />,
                         },
                     ]}
                 />
