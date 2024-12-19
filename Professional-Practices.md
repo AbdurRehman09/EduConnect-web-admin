@@ -313,45 +313,45 @@ Investment appraisal is the process of evaluating the profitability or value of 
   - **Definition:** The difference between the present value of cash inflows and outflows over time.  
   - **Formula:**  
     \[
-    NPV = \sum \left( \frac{Cash\,Inflows}{(1 + r)^t} \right) - Initial\,Investment
+    NPV = \sum \left( \frac{\text{Cash Inflows}}{(1 + r)^t} \right) - \text{Initial Investment}
     \]  
     Where \( r \) = discount rate, \( t \) = time period.  
   - **Advantages:** Considers the time value of money; provides a clear measure of profitability.  
   - **Disadvantages:** Requires estimation of discount rates and cash flows.  
-  *Example:* An investment of $10,000 with inflows of $3,000 annually for 5 years at a 10% discount rate.  
-  \[
-  NPV = \frac{3,000}{1.1} + \frac{3,000}{(1.1)^2} + ... - 10,000
-  \]
+  - **Example:** An investment of $10,000 with inflows of $3,000 annually for 5 years at a 10% discount rate.  
+    \[
+    NPV = \frac{3,000}{1.1} + \frac{3,000}{(1.1)^2} + \ldots - 10,000
+    \]
 
 - **Internal Rate of Return (IRR):**  
   - **Definition:** The discount rate at which the NPV of an investment is zero.  
   - **Interpretation:** Higher IRR indicates a more profitable investment.  
   - **Advantages:** Considers the time value of money; helps compare investment options.  
   - **Disadvantages:** Assumes reinvestment at the same rate, which may not be realistic.  
-  *Example:* If IRR > Required Rate of Return, the investment is accepted.
+  - **Example:** If IRR > Required Rate of Return, the investment is accepted.
 
 - **Profitability Index (PI):**  
   - **Definition:** The ratio of the present value of future cash inflows to the initial investment.  
   - **Formula:**  
     \[
-    PI = \frac{PV\,of\,Inflows}{Initial\,Investment}
+    PI = \frac{\text{PV of Inflows}}{\text{Initial Investment}}
     \]  
   - **Advantages:** Useful for ranking projects; considers time value of money.  
   - **Disadvantages:** Requires accurate cash flow estimates.  
-  *Example:* A project with a PI > 1 is considered viable.
+  - **Example:** A project with a PI > 1 is considered viable.
 
 - **Accounting Rate of Return (ARR):**  
   - **Definition:** The average annual accounting profit as a percentage of the initial investment.  
   - **Formula:**  
     \[
-    ARR = \frac{Average\,Accounting\,Profit}{Initial\,Investment} \times 100
+    ARR = \frac{\text{Average Accounting Profit}}{\text{Initial Investment}} \times 100
     \]  
   - **Advantages:** Simple to calculate.  
   - **Disadvantages:** Ignores the time value of money.  
-  *Example:* A project generating $2,000 in profits annually on a $10,000 investment.  
-  \[
-  ARR = \frac{2,000}{10,000} \times 100 = 20\%
-  \]
+  - **Example:** A project generating $2,000 in profits annually on a $10,000 investment.  
+    \[
+    ARR = \frac{2,000}{10,000} \times 100 = 20\%
+    \]
 
 ## Key Concepts in Investment Appraisal
 - **Time Value of Money (TVM):**  
@@ -387,257 +387,115 @@ Use NPV and Payback Period to determine viability:
 
 ---
 
-Lecture 6: Finance and Accounting
-Introduction
-Finance and accounting are critical to managing organizational resources effectively.
-They provide insights into profitability, sustainability, and operational efficiency.
-Key Financial Statements:
-Balance Sheet:
+# Lecture 6: Finance and Accounting
 
-Definition: A snapshot of an organization’s financial position at a specific point in time.
-Components:
-Assets: What the organization owns (e.g., cash, inventory, equipment).\n
-Liabilities: What the organization owes (e.g., loans, accounts payable).\n
-Equity: The owner’s stake in the business (Assets - Liabilities = Equity).
-Purpose:
-Evaluates the financial health of an organization.\n
-Assesses liquidity and solvency.
-Income Statement (Profit and Loss Statement):
+## Introduction
+Finance and accounting are critical to managing organizational resources effectively. They provide insights into profitability, sustainability, and operational efficiency.
 
-Definition: A report of revenues and expenses over a period, showing profit or loss.
-Key Elements:
-Revenue: Income generated from sales or services.\n
-Expenses: Costs incurred (e.g., salaries, utilities).\n
-Net Income: Revenue - Expenses = Profit or Loss.
-Purpose:
-Measures financial performance over time.
-Guides decision-making for cost management.
-Cash Flow Statement:
+### Key Financial Statements
 
-Definition: Tracks cash inflows and outflows over a period.
-Components:
-Operating Activities: Day-to-day operations (e.g., sales revenue, wages).\n
-Investing Activities: Purchase or sale of long-term assets (e.g., equipment).\n
-Financing Activities: Borrowing or repaying loans, issuing shares.
-Purpose:
-Ensures the organization has sufficient liquidity to meet obligations.
-Highlights cash trends for operational adjustments.
-Key Financial Concepts:
-Depreciation:
+#### Balance Sheet
+- **Definition:** A snapshot of an organization’s financial position at a specific point in time.
+- **Components:**
+  - **Assets:** What the organization owns (e.g., cash, inventory, equipment).
+  - **Liabilities:** What the organization owes (e.g., loans, accounts payable).
+  - **Equity:** The owner’s stake in the business (Assets - Liabilities = Equity).
+- **Purpose:** Evaluates the financial health of an organization and assesses liquidity and solvency.
 
-Definition: Allocation of the cost of an asset over its useful life.\n
-Methods:
-Straight-Line: Equal expense over the asset’s life.\n
-Declining Balance: Higher expense in earlier years.\n
-Purpose:
-Reflects the wear and tear of assets.\n
-Reduces taxable income.
-Working Capital:
+#### Income Statement (Profit and Loss Statement)
+- **Definition:** A report of revenues and expenses over a period, showing profit or loss.
+- **Key Elements:**
+  - **Revenue:** Income generated from sales or services.
+  - **Expenses:** Costs incurred (e.g., salaries, utilities).
+  - **Net Income:** Revenue - Expenses = Profit or Loss.
+- **Purpose:** Measures financial performance over time and guides decision-making for cost management.
 
-Definition: Current assets minus current liabilities.\n
-Purpose:
-Measures short-term liquidity and operational efficiency.
-Positive working capital indicates the ability to meet short-term obligations.
-Break-Even Analysis:
+#### Cash Flow Statement
+- **Definition:** Tracks cash inflows and outflows over a period.
+- **Components:**
+  - **Operating Activities:** Day-to-day operations (e.g., sales revenue, wages).
+  - **Investing Activities:** Purchase or sale of long-term assets (e.g., equipment).
+  - **Financing Activities:** Borrowing or repaying loans, issuing shares.
+- **Purpose:** Ensures the organization has sufficient liquidity to meet obligations and highlights cash trends for operational adjustments.
 
-Definition: Determines the point where revenue equals expenses (no profit, no loss).
-Formula: 
-𝐵
-𝑟
-𝑒
-𝑎
-𝑘
-−
-𝐸
-𝑣
-𝑒
-𝑛
- 
-𝑃
-𝑜
-𝑖
-𝑛
-𝑡
-=
-𝐹
-𝑖
-𝑥
-𝑒
-𝑑
- 
-𝐶
-𝑜
-𝑠
-𝑡
-𝑠
-𝑃
-𝑟
-𝑖
-𝑐
-𝑒
- 
-𝑝
-𝑒
-𝑟
- 
-𝑈
-𝑛
-𝑖
-𝑡
-−
-𝑉
-𝑎
-𝑟
-𝑖
-𝑎
-𝑏
-𝑙
-𝑒
- 
-𝐶
-𝑜
-𝑠
-𝑡
- 
-𝑝
-𝑒
-𝑟
- 
-𝑈
-𝑛
-𝑖
-𝑡
-Break−EvenPoint= 
-PriceperUnit−VariableCostperUnit
-FixedCosts
-​
- 
-Purpose:
-Assists in pricing strategies.\n
-Guides decisions on cost management.
-Financial Ratios:
-Liquidity Ratios:
+### Key Financial Concepts
 
-Measures the ability to meet short-term obligations.\n
-Example: Current Ratio = 
-𝐶
-𝑢
-𝑟
-𝑟
-𝑒
-𝑛
-𝑡
- 
-𝐴
-𝑠
-𝑠
-𝑒
-𝑡
-𝑠
-𝐶
-𝑢
-𝑟
-𝑟
-𝑒
-𝑛
-𝑡
- 
-𝐿
-𝑖
-𝑎
-𝑏
-𝑖
-𝑙
-𝑖
-𝑡
-𝑖
-𝑒
-𝑠
-CurrentLiabilities
-CurrentAssets
-​
- 
-Profitability Ratios:
+#### Depreciation
+- **Definition:** Allocation of the cost of an asset over its useful life.
+- **Methods:**
+  - **Straight-Line:** Equal expense over the asset’s life.
+  - **Declining Balance:** Higher expense in earlier years.
+- **Purpose:** Reflects the wear and tear of assets and reduces taxable income.
 
-Indicates efficiency in generating profits.\n
-Example: Net Profit Margin = 
-𝑁
-𝑒
-𝑡
- 
-𝐼
-𝑛
-𝑐
-𝑜
-𝑚
-𝑒
-𝑅
-𝑒
-𝑣
-𝑒
-𝑛
-𝑢
-𝑒
-×
-100
-Revenue
-NetIncome
-​
- ×100
-Leverage Ratios:
+#### Working Capital
+- **Definition:** Current assets minus current liabilities.
+- **Purpose:** Measures short-term liquidity and operational efficiency. Positive working capital indicates the ability to meet short-term obligations.
 
-Assesses the use of debt to finance operations.\n
-Example: Debt-to-Equity Ratio = 
-𝑇
-𝑜
-𝑡
-𝑎
-𝑙
- 
-𝐷
-𝑒
-𝑏
-𝑡
-𝐸
-𝑞
-𝑢
-𝑖
-𝑡
-𝑦
-Equity
-TotalDebt
-​
- 
-Accounting Practices:
-Accrual Accounting:
+#### Break-Even Analysis
+- **Definition:** Determines the point where revenue equals expenses (no profit, no loss).
+- **Formula:**  
+  \[
+  \text{Break-Even Point} = \frac{\text{Fixed Costs}}{\text{Price per Unit} - \text{Variable Cost per Unit}}
+  \]
+- **Purpose:** Assists in pricing strategies and guides decisions on cost management.
 
-Records revenues and expenses when they are earned/incurred, regardless of cash flow.
-Example: Recognizing revenue from a sale made on credit.
-Cash Accounting:
+### Financial Ratios
 
-Records revenues and expenses only when cash is exchanged.
-Example: Recording revenue only after receiving payment.
-Importance for IT Professionals:
-Budget Management:
+#### Liquidity Ratios
+- **Purpose:** Measures the ability to meet short-term obligations.
+- **Example:**  
+  \[
+  \text{Current Ratio} = \frac{\text{Current Assets}}{\text{Current Liabilities}}
+  \]
 
-IT projects often have significant costs for hardware, software, and personnel.
-Example: Allocating funds for cloud services or cybersecurity.
-Cost-Benefit Analysis:
+#### Profitability Ratios
+- **Purpose:** Indicates efficiency in generating profits.
+- **Example:**  
+  \[
+  \text{Net Profit Margin} = \frac{\text{Net Income}}{\text{Revenue}} \times 100
+  \]
 
-Helps in evaluating whether technology investments align with business goals.
-Example: Assessing ROI for adopting an AI-powered CRM system.
-Resource Allocation:
+#### Leverage Ratios
+- **Purpose:** Assesses the use of debt to finance operations.
+- **Example:**  
+  \[
+  \text{Debt-to-Equity Ratio} = \frac{\text{Total Debt}}{\text{Equity}}
+  \]
 
-Ensures effective use of financial and human resources in IT projects.
-Example: Distributing budgets across multiple projects.
-Practical Example:
-Scenario: A company plans to invest in a new data analytics tool.
-Investment: $100,000\n
-Expected Annual Revenue: $30,000\n
-Depreciation: Straight-line over 5 years.\n
-Analysis:\n
-Calculate NPV using cash inflows and a discount rate.\n
-Use break-even analysis to determine when the investment becomes profitable.
+### Accounting Practices
+
+#### Accrual Accounting
+- Records revenues and expenses when they are earned/incurred, regardless of cash flow.
+- **Example:** Recognizing revenue from a sale made on credit.
+
+#### Cash Accounting
+- Records revenues and expenses only when cash is exchanged.
+- **Example:** Recording revenue only after receiving payment.
+
+### Importance for IT Professionals
+
+#### Budget Management
+- IT projects often have significant costs for hardware, software, and personnel.
+- **Example:** Allocating funds for cloud services or cybersecurity.
+
+#### Cost-Benefit Analysis
+- Helps in evaluating whether technology investments align with business goals.
+- **Example:** Assessing ROI for adopting an AI-powered CRM system.
+
+#### Resource Allocation
+- Ensures effective use of financial and human resources in IT projects.
+- **Example:** Distributing budgets across multiple projects.
+
+### Practical Example
+
+**Scenario:** A company plans to invest in a new data analytics tool.
+- **Investment:** $100,000
+- **Expected Annual Revenue:** $30,000
+- **Depreciation:** Straight-line over 5 years.
+
+**Analysis:**
+- Calculate NPV using cash inflows and a discount rate.
+- Use break-even analysis to determine when the investment becomes profitable.
 
 ---
 
